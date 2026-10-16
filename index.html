@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>
+      point-elimination by Damien Seguin (https://github.com/dmnsgn)
+    </title>
+    <style>
+      :root {
+        --color-dark: #222222;
+        --color-light: #f2f2f2;
+        --color-accent: #95171d;
+      }
+
+      body {
+        margin: 0;
+        overflow: hidden;
+        overscroll-behavior: none;
+        font-family: sans-serif;
+        color: var(--color-dark);
+        background-color: var(--color-light);
+      }
+
+      h1 {
+        position: absolute;
+        top: 0;
+        left: 20px;
+      }
+
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>point-elimination</h1>
+    </main>
+    <script async src="web_modules/es-module-shims.js" type="module"></script>
+    <script src="web_modules/import-map.json" type="importmap-shim"></script>
+
+    <script src="./examples/index.js" type="module-shim"></script>
+  </body>
+</html>

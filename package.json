@@ -1,0 +1,61 @@
+{
+  "name": "point-elimination",
+  "version": "1.0.0",
+  "description": "Eliminate 1D, 2D or 3D points: weighted sample elimination to an exact count with progressive ordering, and greedy elimination by minimum distance, both with adaptive spacing.",
+  "keywords": [
+    "point",
+    "points",
+    "sample-elimination",
+    "poisson-disk",
+    "poisson-disc",
+    "blue-noise",
+    "sampling",
+    "point-cloud",
+    "progressive",
+    "adaptive",
+    "typed-array"
+  ],
+  "homepage": "https://github.com/dmnsgn/point-elimination",
+  "bugs": "https://github.com/dmnsgn/point-elimination/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dmnsgn/point-elimination.git"
+  },
+  "funding": [
+    {
+      "type": "individual",
+      "url": "https://paypal.me/dmnsgn"
+    },
+    {
+      "type": "individual",
+      "url": "https://commerce.coinbase.com/checkout/56cbdf28-e323-48d8-9c98-7019e72c97f3"
+    }
+  ],
+  "license": "MIT",
+  "author": "Damien Seguin (https://github.com/dmnsgn)",
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "main": "./index.js",
+  "types": "./types/index.d.ts",
+  "packageManager": "npm@11.3.0",
+  "scripts": {
+    "test": "node --experimental-test-coverage test",
+    "test:watch": "node --watch --experimental-test-coverage test"
+  },
+  "engines": {
+    "node": ">=24.0.0",
+    "snowdev": ">=3.0.0-alpha.3"
+  },
+  "devDependencies": {
+    "canvas-context": "^3.3.1",
+    "es-module-shims": "^2.8.4",
+    "pex-random": "^2.1.2",
+    "tweakpane": "^4.0.5"
+  }
+}
