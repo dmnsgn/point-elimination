@@ -113,8 +113,8 @@ function eliminate(points, options, indices, count, radius) {
  *   Defaults to the points bounding box, ignoring flat axes. Set it for points
  *   on a curve or surface, eg. the area of a mesh.
  * @property {number} [domainDimension] Dimension of the sampled domain, from 1
- *   to 3, eg. 2 for a surface in 3D. Defaults to the bounding box dimension,
- *   or `dimension` when `domainSize` is set. Set with `domainSize`.
+ *   to 3, eg. 2 for a surface in 3D. Defaults to the bounding box dimension, or
+ *   `dimension` when `domainSize` is set. Set with `domainSize`.
  * @property {ArrayLike<number>} [scales] Per point spacing multiplier for
  *   adaptive sampling, positive and finite. Normalize them so that the domain
  *   mean of 1 / scale^domainDimension is 1.
@@ -129,8 +129,8 @@ function eliminate(points, options, indices, count, radius) {
  * 2015](http://www.cemyuksel.com/research/sampleelimination/)) to a Poisson
  * disk distributed subset of `count` points.
  *
- * Use 3 to 5 times more input points than `count`: more barely improves
- * quality while cost grows quadratically.
+ * Use 3 to 5 times more input points than `count`: more barely improves quality
+ * while cost grows quadratically.
  *
  * @param {ArrayLike<number>} points Flat array of point components.
  * @param {number} count

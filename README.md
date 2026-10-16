@@ -82,7 +82,101 @@ const radius = packingRadius(1, 1000, 2);
 
 <!-- api-start -->
 
-Auto-generated API content.
+<a name="module_pointElimination"></a>
+
+## pointElimination
+
+- [pointElimination](#module_pointElimination)
+  - _static_
+    - [.eliminateByDistance(points, distance, [options])](#module_pointElimination.eliminateByDistance) ⇒ <code>Uint32Array</code>
+    - [.eliminateToCount(points, count, [options])](#module_pointElimination.eliminateToCount) ⇒ <code>Uint32Array</code>
+    - [.packingRadius(domainSize, count, [domainDimension])](#module_pointElimination.packingRadius) ⇒ <code>number</code>
+  - _inner_
+    - [~EliminateByDistanceOptions](#module_pointElimination..EliminateByDistanceOptions) : <code>object</code>
+    - [~EliminateToCountOptions](#module_pointElimination..EliminateToCountOptions) : <code>object</code>
+
+<a name="module_pointElimination.eliminateByDistance"></a>
+
+### pointElimination.eliminateByDistance(points, distance, [options]) ⇒ <code>Uint32Array</code>
+
+Greedy elimination: keeps each point, in order, not closer than `distance` to
+an already kept one. Every removed point of `order` conflicts with a kept
+point.
+
+**Kind**: static method of [<code>pointElimination</code>](#module_pointElimination)
+**Returns**: <code>Uint32Array</code> - Unique indices of the kept points, in visiting order.
+
+| Param     | Type                                                                                            | Default         | Description                           |
+| --------- | ----------------------------------------------------------------------------------------------- | --------------- | ------------------------------------- |
+| points    | <code>ArrayLike.&lt;number&gt;</code>                                                           |                 | Flat array of point components.       |
+| distance  | <code>number</code>                                                                             |                 | Minimum distance between kept points. |
+| [options] | [<code>EliminateByDistanceOptions</code>](#module_pointElimination..EliminateByDistanceOptions) | <code>{}</code> |                                       |
+
+<a name="module_pointElimination.eliminateToCount"></a>
+
+### pointElimination.eliminateToCount(points, count, [options]) ⇒ <code>Uint32Array</code>
+
+Weighted sample elimination ([Yuksel
+2015](http://www.cemyuksel.com/research/sampleelimination/)) to a Poisson
+disk distributed subset of `count` points.
+
+Use 3 to 5 times more input points than `count`: more barely improves quality
+while cost grows quadratically.
+
+**Kind**: static method of [<code>pointElimination</code>](#module_pointElimination)
+**Returns**: <code>Uint32Array</code> - Indices of the kept points, ascending unless
+`progressive`.
+
+| Param     | Type                                                                                      | Default         | Description                     |
+| --------- | ----------------------------------------------------------------------------------------- | --------------- | ------------------------------- |
+| points    | <code>ArrayLike.&lt;number&gt;</code>                                                     |                 | Flat array of point components. |
+| count     | <code>number</code>                                                                       |                 |                                 |
+| [options] | [<code>EliminateToCountOptions</code>](#module_pointElimination..EliminateToCountOptions) | <code>{}</code> |                                 |
+
+<a name="module_pointElimination.packingRadius"></a>
+
+### pointElimination.packingRadius(domainSize, count, [domainDimension]) ⇒ <code>number</code>
+
+Poisson disk radius of `count` points densely packed in a domain of
+`domainSize`: segments in 1D, hexagonal in 2D and face-centered cubic in 3D.
+Points are twice that apart.
+
+**Kind**: static method of [<code>pointElimination</code>](#module_pointElimination)
+
+| Param             | Type                | Default        | Description                           |
+| ----------------- | ------------------- | -------------- | ------------------------------------- |
+| domainSize        | <code>number</code> |                | Length, area or volume of the domain. |
+| count             | <code>number</code> |                |                                       |
+| [domainDimension] | <code>number</code> | <code>3</code> | From 1 to 3.                          |
+
+<a name="module_pointElimination..EliminateByDistanceOptions"></a>
+
+### pointElimination~EliminateByDistanceOptions : <code>object</code>
+
+**Kind**: inner typedef of [<code>pointElimination</code>](#module_pointElimination)
+**Properties**
+
+| Name        | Type                                  | Default        | Description                                                                                                              |
+| ----------- | ------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| [dimension] | <code>number</code>                   | <code>3</code> | Number of components per point, from 1 to 3.                                                                             |
+| [scales]    | <code>ArrayLike.&lt;number&gt;</code> |                | Per point distance multiplier, positive and finite: two points conflict below `distance` times the mean of their scales. |
+| [order]     | <code>ArrayLike.&lt;number&gt;</code> |                | Indices in visiting order: earlier points have priority. Points not listed are discarded. Defaults to the index order.   |
+
+<a name="module_pointElimination..EliminateToCountOptions"></a>
+
+### pointElimination~EliminateToCountOptions : <code>object</code>
+
+**Kind**: inner typedef of [<code>pointElimination</code>](#module_pointElimination)
+**Properties**
+
+| Name              | Type                                  | Default            | Description                                                                                                                                                                      |
+| ----------------- | ------------------------------------- | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [dimension]       | <code>number</code>                   | <code>3</code>     | Number of components per point, from 1 to 3.                                                                                                                                     |
+| [domainSize]      | <code>number</code>                   |                    | Length, area or volume of the sampled domain. Defaults to the points bounding box, ignoring flat axes. Set it for points on a curve or surface, eg. the area of a mesh.          |
+| [domainDimension] | <code>number</code>                   |                    | Dimension of the sampled domain, from 1 to 3, eg. 2 for a surface in 3D. Defaults to the bounding box dimension, or `dimension` when `domainSize` is set. Set with `domainSize`. |
+| [scales]          | <code>ArrayLike.&lt;number&gt;</code> |                    | Per point spacing multiplier for adaptive sampling, positive and finite. Normalize them so that the domain mean of 1 / scale^domainDimension is 1.                               |
+| [weightLimiting]  | <code>boolean</code>                  | <code>true</code>  | Cap the weight of very close neighbors.                                                                                                                                          |
+| [progressive]     | <code>boolean</code>                  | <code>false</code> | Order the output so that each prefix is itself well distributed.                                                                                                                 |
 
 <!-- api-end -->
 

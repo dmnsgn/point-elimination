@@ -24,9 +24,7 @@ export function distance(points, dimension, i, j) {
   return Math.sqrt(sum);
 }
 
-/**
- * @typedef {Float64Array[]} Bounds [min, max]
- */
+/** @typedef {Float64Array[]} Bounds [min, max] */
 
 /**
  * Axis-aligned bounds of a subset of points.

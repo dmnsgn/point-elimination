@@ -11,13 +11,13 @@ const KEY_BITS = 52;
 /**
  * @typedef {object} Grid
  * @property {function(number, function(number): void): void} forEachNeighbor
- *   Call back with the positions in `indices` of the points in the cells
- *   around a position, except itself.
+ *   Call back with the positions in `indices` of the points in the cells around a
+ *   position, except itself.
  */
 
 /**
- * Sparse uniform grid (cell list) over a subset of points, for neighbor
- * queries within `cellSize`.
+ * Sparse uniform grid (cell list) over a subset of points, for neighbor queries
+ * within `cellSize`.
  *
  * @param {ArrayLike<number>} points
  * @param {number} dimension
