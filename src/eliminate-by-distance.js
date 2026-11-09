@@ -3,13 +3,9 @@
  * @ignore
  */
 
-import {
-  distance as getDistance,
-  getBounds,
-  maxScale,
-  pairScale,
-} from "./domain.js";
-import { createGrid } from "./grid.js";
+import { HashGrid, utils } from "spatial-partition";
+
+import { getPoint, maxScale, pairScale } from "./domain.js";
 
 /**
  * @typedef {object} EliminateByDistanceOptions
@@ -38,16 +34,13 @@ export function eliminateByDistance(points, distance, options = {}) {
   const order =
     options.order ?? Uint32Array.from({ length: pointCount }, (_, i) => i);
 
+  const queryRadius = distance * maxScale(scales, order);
   const grid =
     distance > 0
-      ? createGrid(
-          points,
-          dimension,
-          order,
-          getBounds(points, dimension, order),
-          distance * maxScale(scales, order),
-        )
+      ? new HashGrid({ dimension, cellSize: queryRadius }).build(points, order)
       : null;
+  const position = new Float64Array(dimension);
+  const neighbors = [];
   const visited = new Uint8Array(pointCount);
   const kept = new Uint32Array(order.length);
   let keptCount = 0;
@@ -57,16 +50,22 @@ export function eliminateByDistance(points, distance, options = {}) {
     if (visited[i]) continue;
     visited[i] = 1;
     kept[keptCount++] = i;
-    grid?.forEachNeighbor(l, (m) => {
-      const j = order[m];
+    if (!grid) continue;
+    grid.queryRadius(
+      getPoint(points, dimension, i, position),
+      queryRadius,
+      neighbors,
+    );
+    for (const j of neighbors) {
+      if (visited[j]) continue;
+      const minDistance = distance * pairScale(scales, i, j);
       if (
-        !visited[j] &&
-        getDistance(points, dimension, i, j) <
-          distance * pairScale(scales, i, j)
+        utils.avecDistanceSquared(points, i, points, j, dimension) <
+        minDistance * minDistance
       ) {
         visited[j] = 1;
       }
-    });
+    }
   }
 
   return kept.slice(0, keptCount);

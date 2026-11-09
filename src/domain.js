@@ -6,45 +6,7 @@
 // Extents below this fraction of the largest one are flat axes.
 const FLAT_EXTENT = 1e-9;
 
-/**
- * Euclidean distance between two points.
- *
- * @param {ArrayLike<number>} points
- * @param {number} dimension
- * @param {number} i
- * @param {number} j
- * @returns {number}
- */
-export function distance(points, dimension, i, j) {
-  let sum = 0;
-  for (let k = 0; k < dimension; k++) {
-    const delta = points[i * dimension + k] - points[j * dimension + k];
-    sum += delta * delta;
-  }
-  return Math.sqrt(sum);
-}
-
 /** @typedef {Float64Array[]} Bounds [min, max] */
-
-/**
- * Axis-aligned bounds of a subset of points.
- *
- * @param {ArrayLike<number>} points
- * @param {number} dimension
- * @param {ArrayLike<number>} indices
- * @returns {Bounds}
- */
-export function getBounds(points, dimension, indices) {
-  const min = new Float64Array(dimension).fill(Infinity);
-  const max = new Float64Array(dimension).fill(-Infinity);
-  for (const i of indices) {
-    for (let k = 0; k < dimension; k++) {
-      min[k] = Math.min(min[k], points[i * dimension + k]);
-      max[k] = Math.max(max[k], points[i * dimension + k]);
-    }
-  }
-  return [min, max];
-}
 
 /**
  * Size of each axis of bounds, 0 when empty.
@@ -76,6 +38,20 @@ export function boundingDomain(bounds) {
     size: axes.length ? axes.reduce((size, extent) => size * extent, 1) : 0,
     dimension: Math.max(1, axes.length),
   };
+}
+
+/**
+ * Copy the components of a point.
+ *
+ * @param {ArrayLike<number>} points
+ * @param {number} dimension
+ * @param {number} i
+ * @param {Float64Array} out
+ * @returns {Float64Array}
+ */
+export function getPoint(points, dimension, i, out) {
+  for (let k = 0; k < dimension; k++) out[k] = points[i * dimension + k];
+  return out;
 }
 
 /**

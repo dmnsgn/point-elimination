@@ -3,8 +3,9 @@
  * @ignore
  */
 
-import { boundingDomain, distance, getBounds, maxScale } from "./domain.js";
-import { createGrid } from "./grid.js";
+import { HashGrid, utils } from "spatial-partition";
+
+import { boundingDomain, getPoint, maxScale } from "./domain.js";
 import { createMaxHeap } from "./heap.js";
 import { packingRadius } from "./packing-radius.js";
 
@@ -24,9 +25,10 @@ const grow = (array) => {
 };
 
 // Points are addressed by position in ascending `indices`: heap ties pop the
-// highest index and allocations scale with the subset.
+// highest index and allocations scale with the subset. `positions` maps point
+// indices of the subset back to positions.
 function eliminate(points, options, indices, count, radius) {
-  const { dimension, scales, weightLimiting, bounds } = options;
+  const { dimension, scales, weightLimiting, positions } = options;
   const n = indices.length;
   if (count >= n) {
     return { kept: Uint32Array.from(indices), removed: new Uint32Array(0) };
@@ -61,29 +63,39 @@ function eliminate(points, options, indices, count, radius) {
   let edgeCount = 0;
 
   if (radius > 0) {
-    const grid = createGrid(
+    const queryRadius = diameter * maxScale(scales, indices);
+    const grid = new HashGrid({ dimension, cellSize: queryRadius }).build(
       points,
-      dimension,
       indices,
-      bounds,
-      diameter * maxScale(scales, indices),
     );
+    const position = new Float64Array(dimension);
+    const neighborIndices = [];
+    for (let l = 0; l < n; l++) positions[indices[l]] = l;
     for (let l = 0; l < n; l++) {
       start[l] = edgeCount;
       const i = indices[l];
-      grid.forEachNeighbor(l, (m) => {
-        const d = distance(points, dimension, i, indices[m]);
-        if (d >= Math.max(reach(l), reach(m))) return;
+      grid.queryRadius(
+        getPoint(points, dimension, i, position),
+        queryRadius,
+        neighborIndices,
+      );
+      for (const j of neighborIndices) {
+        if (j === i) continue;
+        const m = positions[j];
+        const d = Math.sqrt(
+          utils.avecDistanceSquared(points, i, points, j, dimension),
+        );
+        if (d >= Math.max(reach(l), reach(m))) continue;
         weights[l] += weightOf(scaledDistance(l, d));
         const scaled = scaledDistance(m, d);
-        if (scaled >= diameter) return;
+        if (scaled >= diameter) continue;
         if (edgeCount === neighbors.length) {
           neighbors = grow(neighbors);
           neighborDistances = grow(neighborDistances);
         }
         neighbors[edgeCount] = m;
         neighborDistances[edgeCount++] = scaled;
-      });
+      }
     }
   }
   start[n] = edgeCount;
@@ -148,8 +160,8 @@ export function eliminateToCount(points, count, options = {}) {
   const pointCount = Math.floor(points.length / dimension);
   const indices = Uint32Array.from({ length: pointCount }, (_, i) => i);
   const target = Math.max(0, Math.min(Math.floor(count), pointCount));
-  // Computed once: contains every progressive subset.
-  const bounds = getBounds(points, dimension, indices);
+  const bounds = [new Float64Array(dimension), new Float64Array(dimension)];
+  utils.boundsFromPoints(bounds, points, dimension, pointCount);
 
   let { domainSize, domainDimension } = options;
   if (domainSize === undefined) {
@@ -159,7 +171,12 @@ export function eliminateToCount(points, count, options = {}) {
   }
   domainDimension ??= dimension;
 
-  const eliminateOptions = { dimension, scales, weightLimiting, bounds };
+  const eliminateOptions = {
+    dimension,
+    scales,
+    weightLimiting,
+    positions: new Uint32Array(pointCount),
+  };
   const radius = (c) => packingRadius(domainSize, c, domainDimension);
 
   const { kept } = eliminate(

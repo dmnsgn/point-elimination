@@ -53,9 +53,12 @@
     "pex-random": "^2.1.2",
     "tweakpane": "^4.0.5"
   },
-  "packageManager": "npm@11.3.0",
+  "packageManager": "npm@11.12.1",
   "engines": {
-    "node": ">=24.0.0",
-    "snowdev": ">=3.0.0-alpha.3"
+    "node": ">=26.0.0",
+    "snowdev": ">=3.0.0-alpha.5"
+  },
+  "dependencies": {
+    "spatial-partition": "^1.0.0"
   }
 }
